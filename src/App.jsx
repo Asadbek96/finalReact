@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import DarkLightMode from './components/DarkLightMode'
 import Footer from './components/Footer'
-import Sidebar from './components/Sidebar'
 import AppRouter from './AppRouter'
 import { SearchProvider } from './components/SearchContext'
+import Sidebar from './components/Sidebar'
 
 function LogoutButton({ onLogout, loading }) {
   return (
