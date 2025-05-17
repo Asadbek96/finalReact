@@ -41,21 +41,25 @@ export default function Sidebar({ selected, onSelect }) {
     }`
 
   return (
-    <aside className='w-20 bg-gray-900 dark:bg-gray-200 flex flex-col items-center py-8 shadow-2xl border-r border-blue-800 dark:border-blue-200'>
-     
-      <div className='flex flex-col gap-2 mb-6'>
+    <aside
+      className=' hidden md:block min-w-[70px] max-w-[150px]  w-16 sm:w-20 bg-gray-900 dark:bg-gray-200 flex flex-col items-center py-4 sm:py-8 shadow-2xl border-r border-blue-800 dark:border-blue-200
+      fixed bottom-0 left-0 right-0 z-40 sm:static sm:h-auto sm:rounded-none
+      flex-shrink-0
+    '
+    >
+      <div className='flex flex-row sm:flex-col gap-2 mb-2 sm:mb-6'>
         {genres.map(({ label, value }) => (
           <button
             key={value}
             onClick={() => setSelectedGenre(value)}
             className={genreButtonClass(selectedGenre === value)}
           >
-            {label}
+            <span className='hidden sm:inline'>{label}</span>
+            <span className='sm:hidden'>{label[0]}</span>
           </button>
         ))}
       </div>
-   
-      <div className='flex flex-col gap-4 mt-2'>
+      <div className='flex flex-row sm:flex-col gap-2 sm:gap-4 mt-2 justify-center items-center'>
         {filteredGames.map((game, idx) => {
           const index = sidebarGames.findIndex(g => g.name === game.name)
           return (
@@ -66,21 +70,20 @@ export default function Sidebar({ selected, onSelect }) {
               className={gameButtonClass(selected === index)}
               style={{ outline: 'none', border: 'none' }}
             >
-              <span className='text-2xl'>{game.icon}</span>
-              <span className='absolute left-14 opacity-0 group-hover:opacity-100 bg-gray-700 text-white dark:bg-white dark:text-black px-3 py-1 rounded-lg shadow-lg text-xs font-semibold pointer-events-none transition-all duration-200'>
+              <span className='text-xl sm:text-2xl'>{game.icon}</span>
+              <span className='absolute left-1/2 sm:left-14 top-12 sm:top-auto opacity-0 group-hover:opacity-100 bg-gray-700 text-white dark:bg-white dark:text-black px-2 sm:px-3 py-1 rounded-lg shadow-lg text-xs font-semibold pointer-events-none transition-all duration-200 whitespace-nowrap z-50'>
                 {game.name}
               </span>
             </button>
           )
         })}
       </div>
-      <div className='flex-1' />
-
-      <div className='flex flex-col gap-3 mb-4 w-full items-center'>
+      <div className='flex-1 hidden sm:block' />
+      <div className='flex flex-row sm:flex-col gap-2 sm:gap-3  justify-start absolute left-5 items-start bottom-2'>
         <SidebarLink to='/profile' icon={<FaUser />} label='Профиль' />
         <SidebarLink to='/settings' icon={<FaCog />} label='Параметрлер' />
       </div>
-      <div className='w-8 h-8 rounded-full bg-blue-400 opacity-30 blur-2xl mt-8' />
+      <div className='w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-blue-400 opacity-30 blur-2xl mt-2 sm:mt-8' />
     </aside>
   )
 }
@@ -89,10 +92,10 @@ function SidebarLink({ to, icon, label }) {
   return (
     <Link
       to={to}
-      className='flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-gray-800 dark:bg-gray-300 text-blue-400 dark:text-blue-700 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-500 transition shadow group'
+      className='flex flex-col items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gray-800 dark:bg-gray-300 text-blue-400 dark:text-blue-700 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-500 transition shadow group'
     >
-      <span className='text-xl mb-1'>{icon}</span>
-      <span className='text-[10px] font-semibold group-hover:scale-110 transition'>
+      <span className='text-lg sm:text-xl mb-0.5'>{icon}</span>
+      <span className='text-[9px] sm:text-[10px] font-semibold group-hover:scale-110 transition'>
         {label}
       </span>
     </Link>

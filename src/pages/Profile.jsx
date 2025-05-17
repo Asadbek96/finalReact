@@ -1,14 +1,10 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const mockStats = [
-  { name: 'Flappy Bird', played: 12, bestScore: 45 },
-  { name: 'Tic Tac Toe', played: 8, bestScore: 5 },
-  { name: 'Snake', played: 5, bestScore: 21 },
-]
-
 export default function Profile({ user }) {
   const navigate = useNavigate()
+
+  const stats = user?.stats || []
 
   return (
     <div className='max-w-xl w-full mx-auto bg-transparent dark:bg-gray-100 rounded-xl shadow-2xl p-6 mt-8'>
@@ -22,9 +18,9 @@ export default function Profile({ user }) {
         Профиль: {user?.username}
       </h2>
       <h3 className='text-lg font-semibold mb-2'>Статистика по играм:</h3>
-      <StatsTable stats={mockStats} />
+      <StatsTable stats={stats} />
       <div className='text-gray-500 text-sm'>
-        Барлығы ойындар: {mockStats.length}
+        Барлығы ойындар: {stats.length}
       </div>
     </div>
   )
@@ -41,13 +37,21 @@ function StatsTable({ stats }) {
         </tr>
       </thead>
       <tbody>
-        {stats.map(game => (
-          <tr key={game.name} className='border-t'>
-            <td className='py-2'>{game.name}</td>
-            <td className='py-2'>{game.played}</td>
-            <td className='py-2'>{game.bestScore}</td>
+        {stats.length === 0 ? (
+          <tr>
+            <td colSpan={3} className='py-2 text-center text-gray-400'>
+              Статистика жоқ
+            </td>
           </tr>
-        ))}
+        ) : (
+          stats.map(game => (
+            <tr key={game.name} className='border-t'>
+              <td className='py-2'>{game.name}</td>
+              <td className='py-2'>{game.played}</td>
+              <td className='py-2'>{game.bestScore}</td>
+            </tr>
+          ))
+        )}
       </tbody>
     </table>
   )

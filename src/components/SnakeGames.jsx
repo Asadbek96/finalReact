@@ -1,10 +1,31 @@
 import React, { useEffect, useState } from 'react'
 
-const BOARD_SIZE = 20
-const INITIAL_SNAKE = [{ x: 9, y: 9 }]
+function getBoardParams() {
+  const w = window.innerWidth
+  if (w < 480) {
+    return {
+      BOARD_SIZE: 12,
+      CELL: Math.max(16, Math.floor(w / 16)),
+      GAP: 1,
+    }
+  } else if (w < 768) {
+    return {
+      BOARD_SIZE: 16,
+      CELL: Math.max(20, Math.floor(w / 22)),
+      GAP: 1,
+    }
+  } else {
+    return {
+      BOARD_SIZE: 20,
+      CELL: 24,
+      GAP: 1,
+    }
+  }
+}
+
 const INITIAL_DIRECTION = { x: 1, y: 0 }
 
-function generateFood() {
+function generateFood(BOARD_SIZE) {
   return {
     x: Math.floor(Math.random() * BOARD_SIZE),
     y: Math.floor(Math.random() * BOARD_SIZE),
@@ -12,8 +33,20 @@ function generateFood() {
 }
 
 export default function SnakeGame() {
+  const [boardParams, setBoardParams] = useState(getBoardParams())
+  const { BOARD_SIZE, CELL, GAP } = boardParams
+
+  useEffect(() => {
+    const onResize = () => setBoardParams(getBoardParams())
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  const INITIAL_SNAKE = [
+    { x: Math.floor(BOARD_SIZE / 2), y: Math.floor(BOARD_SIZE / 2) },
+  ]
   const [snake, setSnake] = useState(INITIAL_SNAKE)
-  const [food, setFood] = useState(generateFood())
+  const [food, setFood] = useState(generateFood(BOARD_SIZE))
   const [direction, setDirection] = useState(INITIAL_DIRECTION)
   const [gameOver, setGameOver] = useState(false)
   const [score, setScore] = useState(0)
@@ -23,7 +56,6 @@ export default function SnakeGame() {
   )
   const [showCongrats, setShowCongrats] = useState(false)
   const [started, setStarted] = useState(false)
-
 
   useEffect(() => {
     const handleKey = e => {
@@ -41,7 +73,6 @@ export default function SnakeGame() {
     return () => window.removeEventListener('keydown', handleKey)
   }, [direction, started, gameOver])
 
-
   useEffect(() => {
     if (!started || gameOver) return
     const interval = setInterval(moveSnake, 150)
@@ -54,7 +85,6 @@ export default function SnakeGame() {
       y: snake[0].y + direction.y,
     }
 
-    // Проверка на проигрыш
     if (
       newHead.x < 0 ||
       newHead.y < 0 ||
@@ -75,7 +105,7 @@ export default function SnakeGame() {
 
     const newSnake = [newHead, ...snake]
     if (newHead.x === food.x && newHead.y === food.y) {
-      setFood(generateFood())
+      setFood(generateFood(BOARD_SIZE))
       setScore(s => s + 1)
     } else {
       newSnake.pop()
@@ -84,8 +114,8 @@ export default function SnakeGame() {
   }
 
   function startGame() {
-    setSnake(INITIAL_SNAKE)
-    setFood(generateFood())
+    setSnake([{ x: Math.floor(BOARD_SIZE / 2), y: Math.floor(BOARD_SIZE / 2) }])
+    setFood(generateFood(BOARD_SIZE))
     setDirection(INITIAL_DIRECTION)
     setGameOver(false)
     setScore(0)
@@ -97,16 +127,18 @@ export default function SnakeGame() {
     startGame()
   }
 
+  const boardPx = BOARD_SIZE * CELL + (BOARD_SIZE - 1) * GAP
+
   return (
-    <div className='flex flex-col items-center justify-center min-h-screen bg-transparent text-white p-6'>
-      <h1 className='text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-lime-500 animate-fade-in'>
+    <div className='flex flex-col items-center justify-center min-h-screen bg-transparent text-white p-2 sm:p-6'>
+      <h1 className='text-3xl sm:text-5xl font-extrabold mb-4 sm:mb-8 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-lime-500 animate-fade-in'>
         🐍 Жылан
       </h1>
 
       {!started && (
         <button
           onClick={startGame}
-          className='mb-8 px-8 py-4 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-all transform hover:scale-105 text-2xl font-bold'
+          className='mb-8 px-6 py-3 sm:px-8 sm:py-4 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-all transform hover:scale-105 text-xl sm:text-2xl font-bold'
         >
           ▶️ Бастау
         </button>
@@ -114,19 +146,26 @@ export default function SnakeGame() {
 
       {started && (
         <>
-          <p className='text-2xl font-bold mb-4'>
+          <p className='text-lg sm:text-2xl font-bold mb-2 sm:mb-4'>
             🏆 Ұпай: <span className='text-green-300'>{score}</span>
           </p>
-          <p className='text-lg font-semibold mb-2'>
+          <p className='text-base sm:text-lg font-semibold mb-2'>
             🎖 Ең жоғары ұпай:{' '}
             <span className='text-yellow-300'>{highscore}</span>
           </p>
 
           <div
-            className='relative grid grid-cols-20 gap-1 bg-gray-800 rounded-lg shadow-lg p-1'
+            className='relative grid bg-gray-800 rounded-lg shadow-lg p-1'
             style={{
-              width: BOARD_SIZE * 24,
-              height: BOARD_SIZE * 24,
+              gridTemplateColumns: `repeat(${BOARD_SIZE}, 1fr)`,
+              gap: GAP,
+              width: boardPx,
+              height: boardPx,
+              maxWidth: '98vw',
+              maxHeight: '98vw',
+              minWidth: 120,
+              minHeight: 120,
+              boxSizing: 'content-box',
             }}
           >
             {Array.from({ length: BOARD_SIZE * BOARD_SIZE }).map((_, idx) => {
@@ -138,7 +177,7 @@ export default function SnakeGame() {
               return (
                 <div
                   key={idx}
-                  className={`w-7 h-7 rounded-sm ${
+                  className={`rounded-sm transition-all duration-100 ${
                     isSnake
                       ? isHead
                         ? 'bg-green-700 shadow-lg'
@@ -147,14 +186,20 @@ export default function SnakeGame() {
                       ? 'bg-pink-500 animate-bounce shadow-md'
                       : 'bg-gray-700'
                   }`}
+                  style={{
+                    width: CELL,
+                    height: CELL,
+                    minWidth: CELL,
+                    minHeight: CELL,
+                  }}
                 ></div>
               )
             })}
 
             {showCongrats && (
               <div className='absolute inset-0 flex items-center justify-center z-50 pointer-events-none'>
-                <div className='bg-gradient-to-r from-yellow-200 via-yellow-100 to-yellow-300 bg-opacity-80 rounded-xl shadow-2xl border-4 border-yellow-400 px-8 py-6 flex items-center justify-center animate-fade-in-up'>
-                  <h2 className='text-3xl sm:text-4xl font-bold text-yellow-700 drop-shadow-lg animate-pulse'>
+                <div className='bg-gradient-to-r from-yellow-200 via-yellow-100 to-yellow-300 bg-opacity-80 rounded-xl shadow-2xl border-4 border-yellow-400 px-4 sm:px-8 py-4 sm:py-6 flex items-center justify-center animate-fade-in-up'>
+                  <h2 className='text-2xl sm:text-4xl font-bold text-yellow-700 drop-shadow-lg animate-pulse'>
                     🎉 Жаңа рекорд! 🎉
                   </h2>
                 </div>
@@ -165,24 +210,26 @@ export default function SnakeGame() {
       )}
 
       {gameOver && started && (
-        <div className='mt-8 p-6 bg-gray-800 text-white rounded-lg shadow-xl text-center animate-fade-in'>
-          <h2 className='text-3xl font-bold text-red-400 mb-4'>
+        <div className='mt-6 sm:mt-8 p-4 sm:p-6 bg-gray-800 text-white rounded-lg shadow-xl text-center animate-fade-in'>
+          <h2 className='text-2xl sm:text-3xl font-bold text-red-400 mb-4'>
             Сіз ұтылдыңыз! 😢
           </h2>
           <button
             onClick={resetGame}
-            className='mt-4 px-8 py-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all transform hover:scale-105'
+            className='mt-4 px-6 sm:px-8 py-2 sm:py-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all transform hover:scale-105'
           >
             🔄 Қайта бастау
           </button>
         </div>
       )}
 
-      <div className='mt-8'>
-        <h3 className='text-xl font-bold mb-4'>Ұпай тарихы:</h3>
+      <div className='mt-6 sm:mt-8 w-full max-w-xs sm:max-w-md'>
+        <h3 className='text-lg sm:text-xl font-bold mb-2 sm:mb-4'>
+          Ұпай тарихы:
+        </h3>
         <ul className='list-disc list-inside'>
           {scoreHistory.map((score, idx) => (
-            <li key={idx} className='text-lg'>
+            <li key={idx} className='text-base sm:text-lg'>
               Ойын {idx + 1}: {score} ұпай
             </li>
           ))}
