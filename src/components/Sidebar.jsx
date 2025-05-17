@@ -79,7 +79,7 @@ export default function Sidebar({ selected, onSelect }) {
         })}
       </div>
       <div className='flex-1 hidden sm:block' />
-      <div className='flex flex-row sm:flex-col gap-2 sm:gap-3  justify-start absolute left-5 items-start bottom-2'>
+      <div className='flex flex-row sm:flex-col gap-2 sm:gap-3 top-142 absolute left-6 bottom-2'>
         <SidebarLink to='/profile' icon={<FaUser />} label='Профиль' />
         <SidebarLink to='/settings' icon={<FaCog />} label='Параметрлер' />
       </div>
